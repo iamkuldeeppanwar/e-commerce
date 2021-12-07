@@ -30,17 +30,6 @@ router.post("/users", async (req, res) => {
   }
 });
 
-//test
-router.get("/", (req, res) => {
-  res.cookie("jwt", "hello shobhit", {
-    expires: new Date(Date.now() + 50000),
-    httpOnly: true,
-  });
-  res.status(200).json({
-    success: true,
-  });
-});
-
 //Login User
 router.post("/users/login", async (req, res) => {
   try {
