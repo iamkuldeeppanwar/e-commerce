@@ -162,7 +162,7 @@ router.get("/products/allreviews", async (req, res) => {
 });
 
 //Deleting reviews
-router.delete("/products/allreviews", async (req, res) => {
+router.delete("/products/allreviews", auth, async (req, res) => {
   try {
     const product = await Product.findById(req.query.productId);
 

@@ -3,17 +3,26 @@ const router = new express.Router();
 const User = require("../models/user");
 const auth = require("../middleware/auth");
 const multer = require("multer");
+
+//Creating or Register User
 router.post("/users", async (req, res) => {
   const user = new User(req.body);
   try {
     await user.save();
     const token = await user.generateAuthToken();
+
+    res.cookie("jwt", token, {
+      expires: new Date(Date.now() + 30000),
+      httpOnly: true,
+    });
+
     res.status(201).json({
       success: true,
       user,
       token,
     });
   } catch (e) {
+    console.log(e);
     res.status(400).json({
       success: false,
       e,
@@ -21,6 +30,18 @@ router.post("/users", async (req, res) => {
   }
 });
 
+//test
+router.get("/", (req, res) => {
+  res.cookie("jwt", "hello shobhit", {
+    expires: new Date(Date.now() + 50000),
+    httpOnly: true,
+  });
+  res.status(200).json({
+    success: true,
+  });
+});
+
+//Login User
 router.post("/users/login", async (req, res) => {
   try {
     const user = await User.findByCredentials(
@@ -28,6 +49,12 @@ router.post("/users/login", async (req, res) => {
       req.body.password
     );
     const token = await user.generateAuthToken();
+
+    res.cookie("jwt", token, {
+      expires: new Date(Date.now() + 30000),
+      httpOnly: true,
+    });
+
     res.status(200).json({
       user,
       token,
@@ -41,10 +68,12 @@ router.post("/users/login", async (req, res) => {
   }
 });
 
+//Authenticate user
 router.get("/users/me", auth, (req, res) => {
   res.send(req.user);
 });
 
+//Forget Password
 router.get("/users/fpassword", auth, async (req, res) => {
   try {
     const user = await User.find(req.body.email);
@@ -58,6 +87,7 @@ router.get("/users/fpassword", auth, async (req, res) => {
   }
 });
 
+//Reset Password
 router.post("/users/Rpassword", async (req, res) => {
   const email = req.body.email;
   console.log(email);
@@ -73,6 +103,7 @@ router.post("/users/Rpassword", async (req, res) => {
   }
 });
 
+//Logout User
 router.post("/users/logout", auth, async (req, res) => {
   try {
     req.user.tokens = req.user.tokens.filter((token) => {
@@ -85,6 +116,29 @@ router.post("/users/logout", auth, async (req, res) => {
   }
 });
 
+//Update User Profile
+router.patch("/users/me", auth, async (req, res) => {
+  const updates = Object.keys(req.body);
+  const allowedUpdates = ["name", "email", "password"];
+  const isValidOperation = updates.every((update) =>
+    allowedUpdates.includes(update)
+  );
+
+  if (!isValidOperation) {
+    return res.status(400).send({ error: "invalid updates" });
+  }
+
+  try {
+    updates.forEach((update) => (req.user[update] = req.body[update]));
+    await req.user.save();
+
+    res.send(req.user);
+  } catch (e) {
+    res.status(400).send(e);
+  }
+});
+
+//Delete User
 router.delete("/users/me", auth, async (req, res) => {
   try {
     await req.user.remove();
@@ -94,6 +148,7 @@ router.delete("/users/me", auth, async (req, res) => {
   }
 });
 
+//User Profile Picture
 const upload = multer({
   dest: "avatars",
 });
