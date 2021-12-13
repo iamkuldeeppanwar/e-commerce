@@ -8,6 +8,7 @@ const product = require("../models/products");
 //Creating products
 router.post("/products", auth, userAdmin("admin"), async (req, res) => {
   req.body.user = req.user.id;
+
   const products = new Product(req.body);
   try {
     await products.save();
@@ -26,6 +27,7 @@ router.get("/allProducts", async (req, res) => {
     }
     res.json(products);
   } catch (e) {
+    console.log(e);
     res.status(404).json(e);
   }
 });

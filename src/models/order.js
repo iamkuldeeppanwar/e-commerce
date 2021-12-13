@@ -57,16 +57,16 @@ const orderSchema = mongoose.Schema({
     ref: "User",
     required: true,
   },
-  paymentInfo: {
-    id: {
-      type: String,
-      required: true,
-    },
-    status: {
-      type: String,
-      required: true,
-    },
-  },
+  // paymentInfo: {
+  //   id: {
+  //     type: String,
+  //     required: true,
+  //   },
+  //   status: {
+  //     type: String,
+  //     required: true,
+  //   },
+  // },
   paidAt: {
     type: Date,
     required: true,
@@ -90,11 +90,11 @@ const orderSchema = mongoose.Schema({
     default: 0,
     required: true,
   },
-  orderStatus: {
-    type: String,
-    default: "Processing",
-    required: true,
-  },
+  // orderStatus: {
+  //   type: String,
+  //   default: "Succeed",
+  //   // required: true,
+  // },
   deliveredAt: Date,
   createdAt: {
     type: Date,
